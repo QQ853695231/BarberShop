@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE struts PUBLIC
+    "-//Apache Software Foundation//DTD Struts Configuration 2.0//EN"
+    "http://struts.apache.org/dtds/struts-2.3.dtd">
+<struts>
+	<constant name="struts.objectFactory" value="spring"/>
+	<constant name="struts.i18n.encoding" value="utf-8"></constant>
+	<package name="user"  namespace="/"  extends="struts-default">
+		<interceptors>
+		<interceptor name="loginintercepter" class="barbershop.intercepter.LoginIntercepter"></interceptor>
+				<interceptor-stack name="mystack">
+					<interceptor-ref name="defaultStack"></interceptor-ref>
+					<interceptor-ref name="loginintercepter"/>
+				</interceptor-stack>
+				
+		</interceptors>
+		<global-results>
+			<result name="loginpage"  type="redirect">/login.jsp?info=${info}</result>
+		</global-results>
+		
+		<action name="getvalidatecode" class="validatecode" method="getValidateCode"></action>
+		<action name="login" class="useraction" method="login">
+			
+		    <result name="manager">/WEB-INF/managerbackground.jsp</result>
+			<result name="casher">/WEB-INF/background.jsp</result>
+			</action>
+		<action name="logout" class="useraction" method="logOut">
+			<result name="logout">/login.jsp</result>
+		</action>
+		<action name="registervip" class="casheraction" method="addVip">
+		</action>
+		<action name="lostcard" class="casheraction" method="lostCard"></action>
+		<action name="viprecharge" class="casheraction" method="reCharge"></action>
+		<action name="image"  class="image" method="service"></action>
+		<action name="getcardnum" class="getcardnumber" method="getNumber"></action>
+		<action name="consumer" class="casheraction" method="consumer"></action>
+		<action name="vipusercost" class="casheraction" method="userCost"></action>
+		<action name="queryrestmoney" class="casheraction" method="queryRestMoney"></action>
+		<action name="ordinarycost" class="casheraction" method="ordinaryCost"></action>
+		<action name="creditexchange" class="casheraction" method="creditExchange"></action>
+		<action name="queryvipinfo" class="casheraction" method="queryVipInfo"></action>
+		<action name="modifyvipinfo" class="casheraction" method="modifyVipInfo"></action>
+		<!-- ************************************************************************************* -->
+		<action name="listallvip" class="bossaction" method="listAllVip"></action>
+		<action name="deletevip" class="bossaction" method="deleteVip">
+			<result name="vipmangement" type="redirect">/vipmanagement.html</result>
+		</action>
+		<action name="addemployee" class="bossaction" method="addEmployee"></action>
+		<action name="deleteemployee" class="bossaction" method="deleteEmployee">
+				<result name="back">/employeemanagement.jsp</result>
+		</action>
+		<action name="queryemployee" class="bossaction" method="queryEmployee"></action>
+		<action name="modifyemployee" class="bossaction" method="modifyEmployee"  ></action>
+		<action name="givesalary" class="bossaction" method="giveSalary"></action>
+		<action name="conditionquery" class="bossaction" method="conditionQuery"></action>
+		<action name="delsalarybyid" class="bossaction"  method="delSalaryById"></action>
+		<action name="querytotalmoney" class="bossaction" method="queryTotalMoney"></action>
+		<action name="listallemployee" class="bossaction" method="listAllEmployee"></action>
+		<action name="editemployee" class="bossaction" method="editEmployee" >
+			<result name="editpage">/editpage.jsp</result>
+		</action>
+		<action name="querybycondition" class="bossaction" method="queryVipTransactByDate"></action>
+		<action name="willbeedit" class="bossaction" method="willBeEdit" ></action>
+		<action name="queryUserCost" class="bossaction" method="queryUserCost"></action>
+		<action name="getusercostdata" class="bossaction" method="getUserCostdata"></action>
+		<action name="deleusercostbyid" class="bossaction" method="deleUserCostById"></action>
+	</package>
+	
+</struts>

@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:util="http://www.springframework.org/schema/util"
+	xmlns:p="http://www.springframework.org/schema/p" xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:tx="http://www.springframework.org/schema/tx"
+	xsi:schemaLocation="
+ http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-4.0.xsd
+ http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-4.0.xsd
+ http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-4.0.xsd
+ http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-4.0.xsd">
+	<!-- *********************************定义原型************************************** -->
+	<bean id="vip" class="barbershop.model.Vip"></bean>
+	<bean id="consumercost" class="barbershop.model.ConsumerCost"></bean>
+	<bean id="creditexchange" class="barbershop.model.CreditExchange"></bean>
+	<bean id="userinfo" class="barbershop.model.UserInfoFromBrowser"></bean>
+	<!-- *********************************定义Action层************************************** -->
+	<bean id="useraction" class="barbershop.actions.UserAction"   
+		p:userServiceImple-ref="userservice"
+		p:userInfoFromBrowser-ref="userinfo"
+		/> 
+	<bean id="image" class="barbershop.actions.GetImage"></bean>
+	<bean id="validatecode" class="barbershop.actions.GetValidateCode"></bean>
+	
+	<bean id="casheraction" class="barbershop.actions.CasherAction"
+		p:casherServiceImple-ref="casherservice"
+		p:newVip-ref="vip"
+		p:queryBalanceVip-ref="vip"
+		p:costobj-ref="consumercost"
+		p:supplycardnum-ref="getcardnumber"
+		p:exchange-ref="creditexchange"
+	/>
+	<bean id="getcardnumber" class="barbershop.actions.GetCardNum"
+		p:casherServiceImple-ref="casherservice"
+	/>
+	<bean id="bossaction" class="barbershop.actions.BossAction"
+		p:employeeAndBossServiceImpl-ref="EABService"
+	/>
+	<!-- *********************************定义Service层************************************** -->
+	<bean id="EABService" class="barbershop.serviceimpl.EmployeeAndBossServiceImpl"
+		p:EABDao-ref="EABDaoImpl"
+	/>
+   <bean id="casherservice" class="barbershop.serviceimpl.CasherServiceImple"
+		p:casherDaoImple-ref="casherdaoimple"
+	/>
+	<bean id="userservice" class="barbershop.serviceimpl.UserServiceImple"
+		p:EABDao-ref="EABDaoImpl"
+	/>
+	<!-- *********************************定义Dao层************************************** -->
+	<bean id="EABDaoImpl" class="barbershop.daoimpl.EmployAndBossDaoImpl"
+	p:sf-ref="sessionFactory"
+	/>
+	<bean id="casherdaoimple" class="barbershop.daoimpl.CasherDaoImple"
+	p:sf-ref="sessionFactory"
+	/>
+	<!-- 定义数据源Bean，使用C3P0数据源实现，并注入数据源的必要信息 -->
+	<bean id="dataSource" class="com.mchange.v2.c3p0.ComboPooledDataSource"
+		destroy-method="close" p:driverClass="com.mysql.jdbc.Driver"
+		p:jdbcUrl="jdbc:mysql://localhost/barbershop" p:user="root"
+		p:password="2222" p:maxPoolSize="40" p:minPoolSize="2"
+		p:initialPoolSize="2" p:maxIdleTime="30" />
+	<!-- 定义Hibernate的SessionFactory，SessionFactory需要依赖数据源，注入dataSource -->
+	<bean id="sessionFactory"
+		class="org.springframework.orm.hibernate4.LocalSessionFactoryBean"
+		p:dataSource-ref="dataSource">
+		<!-- annotatedClasses用来列出全部持久化类 -->
+		<property name="annotatedClasses">
+			<list>
+				<!-- 以下用来列出所有的PO类 -->
+				<value>barbershop.model.Employee</value>
+				<value>barbershop.model.Vip</value>
+				<value>barbershop.model.ConsumerCost</value>
+				<value>barbershop.model.CreditExchange</value>
+				<value>barbershop.model.Salary</value>
+			</list>
+		</property>
+		<!-- 定义Hibernate SessionFactory的属性 -->
+		<property name="hibernateProperties">
+			<props>
+				<!-- 指定Hibernate的连接方言 -->
+				<prop key="hibernate.dialect">org.hibernate.dialect.MySQL5InnoDBDialect</prop>
+				<!-- 设置更新表的方式，如果没有表则创建 -->
+				<prop key="hibernate.hbm2ddl.auto">update</prop>
+				<prop key="current_session_context_class">thread</prop>
+				<prop key="hibernate.show_sql">true</prop>
+				<prop key="hibernate.current_session_context_class">org.springframework.orm.hibernate4.SpringSessionContext
+				</prop>
+			</props>
+		</property>
+		
+	</bean>
+	<!-- 配置事务增强处理Bean,指定事务管理器 -->
+	<tx:annotation-driven transaction-manager="transactionManager" />
+	<tx:advice id="txAdvice" transaction-manager="transactionManager">
+		<!-- 用于配置详细的事务定义 -->
+		<tx:attributes>
+			<!-- 所有以'get'开头的方法是read-only的 -->
+			<tx:method name="get*" read-only="true" />
+			<!-- 其他方法使用默认的事务设置，指定超时时长为5秒 -->
+			<tx:method name="*" isolation="DEFAULT" propagation="REQUIRED"
+				timeout="5" />
+		</tx:attributes>
+	</tx:advice>
+	<!-- AOP配置的元素 -->
+	<aop:config>
+		<!-- 配置一个切入点 -->
+		<aop:pointcut id="myPointcut" expression="bean(allService)" />
+		<!-- 指定在myPointcut切入点应用txAdvice事务增强处理 -->
+		<aop:advisor advice-ref="txAdvice" pointcut-ref="myPointcut" />
+	</aop:config>
+	
+	
+		<!-- 配置Hibernate的局部事务管理器，使用HibernateTransactionManager类 -->
+	<!-- 该类是PlatformTransactionManager接口针对采用Hibernate的特定实现类 -->
+	<!-- 配置HibernateTransactionManager需依赖注入SessionFactory -->
+	<bean id="transactionManager"
+		class="org.springframework.orm.hibernate4.HibernateTransactionManager"
+		p:sessionFactory-ref="sessionFactory" />
+
+	
+</beans>

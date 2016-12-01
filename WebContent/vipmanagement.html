@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <script src="js/jquery-2.1.4.js"></script>
+    <meta charset="UTF-8">
+    <title>会员信息管理</title>
+    <script type="text/javascript">
+        function generatedrow(responsetxt){
+            $.each(responsetxt,function(i,item)
+            {
+                $("#allinfo").append(
+                        "<tr class='detail'>"+
+                        "<td>"+"<input type='checkbox' name= 'number' value='"+item.vip_number+"'/></td>"+
+                        "<td>"+item.vip_number+"</td>"+
+                        "<td>"+item.vip_name+"</td>"+
+                        "<td>"+item.vip_phone+"</td>"+
+                        "<td>"+item.card_level+"</td>"+
+                        "<td>"+item.card_balance+"</td>"+
+                        "<td>"+item.card_score+"</td>"+
+                        "<td>"+item.card_time+"</td>"+
+                        "<td>"+"<a href='deletevip?number="+item.vip_number+"'>"+"删除"+"</a>"+"</td>"+
+                        "</tr>"
+                );
+            });
+
+        }
+        $(function(){
+        	$("#qurybtn").click(function () {
+        		$("#allinfo tr").remove(".detail");
+                if($("#querytime").val()=="")
+                {
+                    $.getJSON("listallvip",function(responsetxt){
+                            generatedrow(responsetxt);
+                    });
+                }
+                else
+                {
+                    $.getJSON("querybycondition",
+                            {
+                                viptransactquerytime:$("#querytime").val(),
+                                viptransactqueryway:$("input[type='radio']:checked").val()
+                            },
+                            function (response) {
+                                generatedrow(response);
+
+                            });
+                }
+
+
+            });
+             $(".head").find("td").addClass("title");
+            
+            
+        });
+    </script>
+    <style type="text/css">
+        .head{
+            font-size: 30px;
+            text-align: center;
+
+        }
+        .title{
+            text-align: center;
+            width:160px;
+            font-weight: bold;
+        }
+        .detail{
+        	color:black;
+        	font-size:20px;
+        	font-weight:bold;
+        	text-align: center;
+        }
+        .condition
+        {
+            margin: auto auto;
+            width:500px;
+            height:50px;
+            border:1px solid #FF0000;
+        }
+        .btn{
+        margin-left:2px;
+    }
+    </style>
+</head>
+<body>
+<form action="deletevip" method="post">
+    <div class="condition">
+
+        <span>请选择日期：<input type="date" id="querytime"/> </span> <span>
+        <button id="qurybtn" type="button">查询</button> </span><br>
+        <span><input type="radio" name="queryway" value="year">按年份查询</input> </span>
+        <span><input type="radio" name="queryway" value="month">按月份查询</input></span>
+
+    </div>
+    <table id="allinfo"  border="1" cellspacing="0">
+        <thead class="head">
+            <tr>
+            	<td></td>
+                <td>会员号</td>
+                <td>会员名</td>
+                <td>手机号</td>
+                <td>会员等级</td>
+                <td>卡余额</td>
+                <td>积分</td>
+                <td>办卡时间</td>
+                <td>操作</td>
+            </tr>
+        </thead>
+
+
+    </table>
+    <button type="submit" class="btn">批量删除</button>
+  </form>
+</body>
+</html>

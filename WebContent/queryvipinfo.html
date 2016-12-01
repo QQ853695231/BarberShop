@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <script src="js/jquery-2.1.4.js"></script>
+    <meta charset="UTF-8">
+    <title>会员信息</title>
+    <script type="text/javascript">
+        function validate_required(field,alerttxt)
+        {
+            with (field)
+            {
+                if (value==null||value=="")
+                {
+                    alert(alerttxt);
+                    field.focus();
+                    return false;
+                    }
+                else {return true;}
+            }
+        };
+        $(function(){
+            $("#modifybtn").click(function(){
+                var flag=validate_required(phoneornumber,"请输入查询码！") &&
+                        validate_required(vipphone,"请输入手机号！") &&
+                        validate_required(vipname,"请输入姓名！") &&
+                        validate_required(viplevel,"请选择等级！") &&
+                        validate_required(vipbalance,"请输入余额！");
+                        validate_required(vipcredit,"请输入积分！");
+               if(flag==true)
+               {
+                   $.get("modifyvipinfo",{
+                       modifyvipphone: $("#vipphone").val(),
+                       modifyvipname: $("#vipname").val(),
+                       modifyvipnum: $("#vipnum").val(),
+                       modifyviplevel: $("#viplevel").val(),
+                       modifyvipbalance:  $("#vipbalance").val(),
+                       modifyvipcredit: $("#vipcredit").val()
+
+                   }, function (responsetxt) {
+                       alert(responsetxt);
+                   });
+
+               }
+                else{
+
+                   alert("有未填项");
+               }
+
+
+            });
+            $(".right input").addClass("input");
+            $(".left_ul li").addClass("left_ul");
+            $("#viplevel").addClass("input");
+            $("#phoneornumber").blur(function(){
+                $.getJSON("queryvipinfo",{queryvipinfonum:$("#phoneornumber").val()}, function (jsondata) {
+                    $("#vipphone").val(jsondata.vip_phone);
+                    $("#vipname").val(jsondata.vip_name);
+                    $("#vipnum").val(jsondata.vip_number);
+                    $("#viplevel").val(jsondata.card_level);
+                    $("#vipbalance").val(jsondata.card_balance);
+                    $("#vipcredit").val(jsondata.card_score);
+
+                });
+
+            });
+        });
+
+
+    </script>
+    <style type="text/css">
+        .box{
+            width:600px;
+            height:600px;
+            border:1px solid #FF0000;
+            margin:auto auto;
+        }
+        .title{
+            text-align: center;
+            font-size: 35px;
+            font-weight: bold;
+            color: red;
+        }
+        .left{
+            width: 200px;
+            height:300px;
+            margin-left:96px;
+            padding-top: 0px;
+        }
+        .right{
+            float:right;
+            width: 200px;
+            height:300px;
+            margin-top: -302px;
+            margin-right: 96px;
+        }
+        .left_ul{
+            list-style: none;
+            font-size:32px;
+            margin-top: 0px;
+            margin-bottom: 15px;
+        }
+        .input{
+            border-radius:14px;
+            width:200px;
+            height:36px;
+            margin-bottom: 10px;
+            font-size: 30px;
+        }
+        #modifybtn{
+            font-size: 32px;
+            border-radius: 31px;
+            margin:0px auto;
+            display: block;
+
+        }
+        .btn{
+            margin-top: 90px;
+        }
+    </style>
+</head>
+<body>
+<div class="box">
+    <p class="title">
+        会员信息修改
+    </p>
+    <div class="left">
+        <ul class="left_ul">
+            <li>查询码：</li>
+            <li>会员号：</li>
+            <li>会员姓名：</li>
+            <li>手机号：</li>
+            <li>会员等级：</li>
+            <li>会员余额：</li>
+            <li>会员积分：</li>
+        </ul>
+
+    </div>
+    <div class="right">
+
+        <input type="text" id="phoneornumber"  />
+        <input type="text" id="vipnum" disabled="disabled"/>
+        <input type="text" id="vipname"/>
+        <input type="text" id="vipphone"/>
+        <select id="viplevel">
+            <option value="金卡">金卡</option>
+            <option value="银卡">银卡</option>
+            <option value="铜卡">铜卡</option>
+        </select>
+        <input type="text" id="vipbalance"/>
+        <input type="text" id="vipcredit"/>
+
+    </div>
+    <div class="btn">
+        <button type="button" id="modifybtn">确认修改</button>
+    </div>
+
+</div>
+</body>
+</html>

@@ -1,0 +1,53 @@
+@CHARSET "UTF-8";
+    *{margin:0px 0px;}
+            .frame
+            {
+            float:left;
+            height: 195px;
+            width: 374px;
+            margin:190px 240px;
+            font-size:15px;
+            }   
+            body
+            {
+                background-image: url(../images/11.jpg);
+                background-repeat:no-repeat;
+                background-size:100% 139%;
+            }
+            .btn
+            {
+            outline:none;
+            background:#fff;
+            font-size:20px;
+            width:77px;
+            height:40px;
+            border-radius: 20px; 
+            margin-left: 40px;
+            } 
+            <%--.frame_in
+            {
+            size:40px;
+            border:1px solide black;
+            font-size:25px;
+            width:190px;
+            border-radius:16px;
+           } --%>
+         .role
+         {
+            
+            font-size:24px;
+            margin-left:3px;
+         }
+        .in_role{margin-left:27px;}
+        
+        .info
+        {
+            text-align:center;
+            font-size:22px;
+            color:black;
+       }
+      a{text-decoration:none;}
+      .error{
+        color:red;
+        font-size:20px;
+      }
